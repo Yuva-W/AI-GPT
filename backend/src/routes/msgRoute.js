@@ -12,6 +12,8 @@ router.post("/new", async (req, res) => {
     try {
         const { message } = req.body;
 
+        console.log(message)
+
         await Message.create({
             role: "user",
             content: message
@@ -30,11 +32,9 @@ router.post("/new", async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error.message);
-
         res.status(500).json({
             success: false,
-            message: "unable to process request"
+            message: `${error.message}`
         });
     }
 });
