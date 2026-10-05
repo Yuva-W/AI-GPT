@@ -9,8 +9,8 @@ router.get("/threads", async (req, res) => {
     try {
         const threads = await Thread.find({}).sort({updatedAt: -1});
         res.status(200).json(threads);
-    } catch (err) {
-        console.log(err);
+    } catch (error) {
+        console.log(error);
         res.status(500).json({error: "failed to fetch threads"});
     }
 });
@@ -29,8 +29,8 @@ router.get("/threads/:threadId", async (req, res) => {
         }
 
         res.status(200).json(thread);
-    } catch (err) {
-        console.log(err);
+    } catch (error) {
+        console.log(error);
         res.status(500).json({error: "failed to fetch thread"});
     }
 });
@@ -51,7 +51,7 @@ router.delete("/threads/:threadId", async (req, res) => {
             message: "deleted."
         });
     } catch (error) {
-        console.log(err);
+        console.log(error);
         res.status(500).json({error: "failed to fetch thread"});
     }
 });
@@ -97,9 +97,9 @@ router.post("/chat", async (req, res) => {
             replay: aiResponse
         });
 
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({error: err});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error});
     }
 });
 
