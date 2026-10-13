@@ -1,21 +1,21 @@
 const API_URL = "http://localhost:8000";
 
-const sendMessage = async (message) => {
-    const response =  await fetch(`${API_URL}/new`,{
+const sendMessage = async (threadId, message) => {
+    const response =  await fetch(`${API_URL}/chat`,{
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-            "message": message
-        })
+        body: JSON.stringify({ threadId, message })
     });
 
+    const data = await response.json();
+
     if (!response.ok){
-        throw new Error("Failed to send message");
+        throw new Error(data.error || "Failed to get AI response");
     }
     
-    return response.json();
+    return data;
 }
 
 export default sendMessage;

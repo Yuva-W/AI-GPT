@@ -1,0 +1,10 @@
+.sidebar {
+    height: 99vh;
+    width: 16vw;
+    background-color: #1a1a1a;
+    margin: 4px;
+    border-radius: 10px;
+    border: 1px solid #333333;
+    box-sizing: border-box;
+    color: #fff;
+}
