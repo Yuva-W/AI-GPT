@@ -1,130 +1,120 @@
-import { useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { useActiveThread, useChat } from "../context/ChatContext.jsx";
 
 function Chat() {
+    const { messages } = useActiveThread();
+    const { sendMessage, loading, error } = useChat();
+
     const [message, setMessage] = useState("");
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    }, [messages, loading]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const content = message.trim();
+
+        if (!content || loading) return;
+
+        setMessage("");
+        await sendMessage(content);
+    };
 
     return (
-        <div className="relative flex h-full flex-col items-center justify-center px-5">
+        <div className="flex h-full min-h-0 flex-col bg-[#212121]">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+                {messages.length === 0 ? (
+                    <div className="flex h-full flex-col items-center justify-center text-center">
+                        <h1 className="text-3xl font-medium tracking-tight text-white sm:text-4xl">
+                            Start your New Chat ...
+                        </h1>
 
-            <div className="mb-5 text-center">
-                { message.length == 0 ? <h1 className="text-3xl font-medium tracking-tight text-white sm:text-4xl">
-                    Start your New Chat ...
-                </h1>
-                 : <p>hello</p>}
-                
-                <p className="mt-3 text-sm text-gray-400">
-                    What would you like to explore today?
-                </p>
+                        <p className="mt-3 text-sm text-gray-400">
+                            What would you like to explore today?
+                        </p>
+                    </div>
+                ) : (
+                    <div className="mx-auto w-full max-w-3xl space-y-6">
+                        {messages.map((msg, index) => (
+                            <div
+                                key={`${msg.role}-${index}`}
+                                className={`flex ${
+                                    msg.role === "user"
+                                        ? "justify-end"
+                                        : "justify-start"
+                                }`}
+                            >
+                                <div
+                                    className={`max-w-[90%] break-words rounded-2xl px-4 py-3 text-sm leading-7 sm:max-w-[85%] ${
+                                        msg.role === "user"
+                                            ? "whitespace-pre-wrap bg-[#303030] text-white"
+                                            : "bg-[#2a2a2a] text-gray-100"
+                                    }`}
+                                >
+                                    {msg.role === "user" ? (
+                                        msg.content
+                                    ) : (
+                                        <ReactMarkdown>
+                                            {msg.content || ""}
+                                        </ReactMarkdown>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+
+                        {loading && (
+                            <p className="text-sm text-gray-400">
+                                AI is thinking...
+                            </p>
+                        )}
+
+                        {error && (
+                            <p className="rounded-lg bg-red-950/40 p-3 text-sm text-red-400">
+                                {error}
+                            </p>
+                        )}
+
+                        <div ref={messagesEndRef} />
+                    </div>
+                )}
             </div>
 
+            <div className="w-full px-4 pb-3 pt-2">
+                <form
+                    onSubmit={handleSubmit}
+                    className="mx-auto flex w-full max-w-3xl items-center gap-3 rounded-3xl border border-[#414141] bg-[#303030] p-3 shadow-lg transition focus-within:border-gray-500"
+                >
+                    <input
+                        type="text"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        placeholder="Ask anything..."
+                        disabled={loading}
+                        className="min-w-0 flex-1 bg-transparent px-2 py-2 text-base text-white outline-none placeholder:text-gray-400"
+                    />
+
+                    <button
+                        type="submit"
+                        disabled={!message.trim() || loading}
+                        className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        {loading ? "Sending..." : "Send"}
+                    </button>
+                </form>
+
+                <p className="mt-3 text-center text-xs text-gray-500">
+                    AI can make mistakes. Check important information.
+                </p>
+            </div>
         </div>
     );
 }
 
 export default Chat;
-
-
-// import { useState } from "react";
-// import ChatWindow from "./ChatWindow";
-// import { sendMessage } from "../services/api";
-
-// function Chat() {
-//     const [messages, setMessages] = useState([]);
-//     const [loading, setLoading] = useState(false);
-//     const [threadId] = useState(() => crypto.randomUUID());
-
-//     const handleSend = async (message) => {
-//         if (loading || !message.trim()) return;
-
-//         setMessages((prev) => [
-//             ...prev,
-//             { role: "user", content: message },
-//         ]);
-
-//         setLoading(true);
-
-//         try {
-//             const data = await sendMessage(threadId, message);
-
-//             setMessages((prev) => [
-//                 ...prev,
-//                 {
-//                     role: "assistant",
-//                     content: data.reply,
-//                 },
-//             ]);
-//         } catch (error) {
-//             setMessages((prev) => [
-//                 ...prev,
-//                 {
-//                     role: "assistant",
-//                     content: `Error: ${error.message}`,
-//                 },
-//             ]);
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     return (
-//         <div className="relative flex h-full min-h-0 flex-col">
-//             {/* Messages */}
-//             <div className="flex-1 overflow-y-auto px-5 py-6">
-//                 {messages.length === 0 ? (
-//                     <div className="flex h-full flex-col items-center justify-center text-center">
-//                         <h1 className="text-3xl font-medium text-white sm:text-4xl">
-//                             Start your New Chat ...
-//                         </h1>
-
-//                         <p className="mt-3 text-sm text-gray-400">
-//                             What would you like to explore today?
-//                         </p>
-//                     </div>
-//                 ) : (
-//                     <div className="mx-auto w-full max-w-3xl space-y-6">
-//                         {messages.map((msg, index) => (
-//                             <div
-//                                 key={index}
-//                                 className={`flex ${
-//                                     msg.role === "user"
-//                                         ? "justify-end"
-//                                         : "justify-start"
-//                                 }`}
-//                             >
-//                                 <div
-//                                     className={`max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-4 py-3 leading-7 ${
-//                                         msg.role === "user"
-//                                             ? "bg-[#303030] text-white"
-//                                             : "text-gray-100"
-//                                     }`}
-//                                 >
-//                                     {msg.content}
-//                                 </div>
-//                             </div>
-//                         ))}
-
-//                         {loading && (
-//                             <p className="text-sm text-gray-400">
-//                                 AI is thinking...
-//                             </p>
-//                         )}
-//                     </div>
-//                 )}
-//             </div>
-
-//             {/* Input */}
-//             <div className="w-full px-4 pb-3 pt-2">
-//                 <ChatWindow
-//                     onSend={handleSend}
-//                     loading={loading}
-//                 />
-
-//                 <p className="mt-2 text-center text-xs text-gray-500">
-//                     AI can make mistakes. Check important information.
-//                 </p>
-//             </div>
-//         </div>
-//     );
-// }
-
-// export default Chat;

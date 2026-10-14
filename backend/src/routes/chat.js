@@ -94,7 +94,7 @@ router.post("/chat", async (req, res) => {
         await thread.save();
 
         res.status(200).json({
-            replay: aiResponse
+            reply: aiResponse
         });
 
     } catch (error) {

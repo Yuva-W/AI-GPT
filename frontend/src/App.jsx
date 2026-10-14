@@ -1,15 +1,17 @@
-import Chatwindow from "./components/ChatWindow";
-import Sidebar from "./components/Sidebar";
+import { ChatProvider } from "./context/ChatContext.jsx";
+import Sidebar from "./components/Sidebar.jsx";
+import Chat from "./components/Chat.jsx";
 
 function App() {
     return (
-        <div className="flex h-screen overflow-hidden bg-[#212121]">
-            <Sidebar />
-
-            <main className="min-w-0 flex-1">
-                <Chatwindow />
-            </main>
-        </div>
+        <ChatProvider>
+            <div className="flex h-screen overflow-hidden bg-[#212121] text-white">
+                <Sidebar />
+                <main className="min-w-0 flex-1">
+                    <Chat />
+                </main>
+            </div>
+        </ChatProvider>
     );
 }
 
