@@ -8,6 +8,12 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  server: {
+    proxy: {
+      '/threads': 'http://localhost:8000',
+      '/chat': 'http://localhost:8000',
+    },
+  },
 })
 
 
